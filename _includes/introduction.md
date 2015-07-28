@@ -1,34 +1,34 @@
+[Dependency Injection (DI)](http://en.wikipedia.org/wiki/Dependency_injection)は、クライアントとサービスの結合を緩やかにできる人気のパターンです。
 
-[Dependency Injection (DI)](http://en.wikipedia.org/wiki/Dependency_injection) is a popular pattern which encourages loose coupling between a services’ clients and service implementations.
+このガイドで説明するのは、できるだけScalaでDIする方法です。それと[MacWire](https://github.com/adamw/macwire)のヘルプです。
 
-This guide describes how to do Dependency Injection using the Scala language constructs as much as possible, while remaining practical, with the help of the [MacWire](https://github.com/adamw/macwire) library where necessary. 
-
-Dependency Injection is a *simple* concept, and it can be implemented using relatively few *simple* constructs. We should avoid over-complicating and over-using containers or frameworks, without thoroughly analysing the costs.
+Dependency Injection はシンプルなコンセプトで比較的シンプルに作ることができますが、コストを考えずにDIのコンテナやフレームワークを多用したり複雑にするのは避けるべきです。
 
 <p class="message">
-  This guide is <a href="https://github.com/di-in-scala/di-in-scala.github.io-sources">available on GitHub</a>, so if you think something is missing, not clear enough, or can be done better, don't hesitate and send a pull request!
+  このガイドは日本語訳したものです(<a href="https://github.com/ryoppy/di-in-scala.github.io-sources">GitHub</a>)。
+  間違いや、十分でないところ、ベターじゃないとこあれば、どしどしプルリクおなしゃす。
 </p>
 
-## What is Dependency Injection?
+## DIとは?
 
-DI is all about decoupling client and service code (the client may happen to be another service). Services need to expose information on what dependencies they need. Instead of creating dependent service implementations inside the service itself, *references* to dependent services are "injected". This makes the code easier to understand, more testable and more reusable.
+DIは、クライアントとサービスのコードを分離します(クライアントは、他のサービスかもしれません)。サービスは、何に依存しているか分かるようにする必要があります。サービスの中で依存したサービスを作る代わりに、依存してるサービスの参照が"注入"されます。そうすることでコードの理解が早まるうえ、テストビリティや再利用性が高まります。
 
-The means of injecting the dependencies vary from approach to approach, but the one we will be using here is passing dependencies through constructor parameters. Other possibilities include setter/field injection, or using a service locator. Hence, the essence of DI can be summarised as *using constructor parameters*.
+依存性を注入するのは、色々やり方があります。しかし、私たちはコンストラクタパラメータで渡す方法を使います。他にもやり方はあり、setter/fieldやservice locatorなどがあります。
 
-A very important aspect of DI is Inversion of Control. The service implementations have to be created "outside" the services, e.g. by a container or some external wiring code. Using `new` directly to create a dependency is not allowed inside a service.
+DIは、[Inversion of Control](https://ja.wikipedia.org/wiki/%E5%88%B6%E5%BE%A1%E3%81%AE%E5%8F%8D%E8%BB%A2)という需要な側面がある。実装したあるサービスは他のサービスの"外側"で作られるべきで、あるサービスの中で直接`new`で依存したサービスを作るのは許されません。
 
-If you are not yet sold on DI, I recommend reading the [motivation behind Guice](https://github.com/google/guice/wiki/Motivation). It uses Java as the base language, but the ideas are the same and apply universally.
+もしDIがよく分かってなければ、[motivation behind Guice](https://github.com/google/guice/wiki/Motivation)を読むことをお勧めします。これはJavaですが、アイデアは同じなので参考になるでしょう。
 
-## Other approaches
+## 他のアプローチ
 
-There are numerous frameworks and approaches implementing DI in various languages and on various platforms. Below are a couple of alternatives to the pure Scala+MacWire approach presented here.
+DIのフレームワークはたくさんあります。下記は、pure Scala+MacWireの代わりになるものを示しています。
 
 Using frameworks:
 
-* [Subcut](https://github.com/dickwall/subcut): mix of the service locator/dependency injection patterns
-* [Scaldi](http://scaldi.org/): similar to Subcut
-* [Spring](http://spring.io/): Spring is a very popular Java DI framework (and much more). It also works with Scala.
-* [Guice](https://github.com/google/guice): another popular Java DI framework
+* [Subcut](https://github.com/dickwall/subcut): service locator/dependency injectionをmixしたパターンです。
+* [Scaldi](http://scaldi.org/): Subcutと似てます。
+* [Spring](http://spring.io/): Springは人気のJavaフレームワークでScalaでも使えます。
+* [Guice](https://github.com/google/guice): 人気のJavaのDIフレームワークです。
 
 Using pure Scala:
 
@@ -37,9 +37,9 @@ Using pure Scala:
 
 ## Running example
 
-To provide code examples throughout the guide, we will need a running example. 
+## 実行例
 
-Suppose we are creating a system for a train station. Our goal is to call the method to prepare (load, compose cars) and dispatch the next train. In order to do that, we need to instantiate the following service classes:
+駅のシステムを作ってると仮定します。ゴールは、prepareメソッド (load, compose cars)を呼ぶことと、次の電車を送り出すことです。そのためには、以下のサービスクラスをインスタンス化する必要があります。
 
 ````scala
 class PointSwitcher()
@@ -64,4 +64,4 @@ class TrainStation(
 }
 ````
 
-The dependencies of each class are expressed as constructor parameters. The dependencies form an object graph, which needs to be wired.
+各クラスの依存関係はコンストラクタパラメータで表してます。
