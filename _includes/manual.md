@@ -1,11 +1,11 @@
 
-An approach that is often dismissed too easily is doing dependency injection by hand. While this requires a bit more typing, when doing things manually you are free from any constraints that a framework may impose, and hence a lot of flexibility is gained.
+簡単なアプローチとして、手動でDIする方法かあります。これは入力が少し多くなりますが、フレームワークの制約を受けません。とにかく、とても柔軟です。
 
-When using DI, we have to somehow create (wire) the object graph, that is create instances of the given classes with the appropriate dependencies. When using a framework, this task is delegated to a container. But nothing keeps us from simply writing the code!
+DIを使った時、クラスの依存関係をちゃんと考える必要があります。ですがフレームワークを使えばコンテナにまかせることができます。しかし、それではシンプルなコードを保てないんです!
 
-The object graph should be created as late as possible. This may be, for example, the "end of the world", that is the main class of our application. If you have used DI containers before, when using manual DI with or without MacWire, you will soon re-discover the benefits of having a main method in your application.
+オブジェクトの関係は、できるだけ後で作られるべきです。例えばメインクラスとか(普通はメインクラスはモジュールが出来てから書くよね?みたいなことを行っているのかな..?)。もしDIコンテナを使う前だったら、手動でのDIをやってみてください。MacWireは使っても使わなくてもいいので。そうすればすぐにメインメソッドで再発見があるでしょう。
 
-To be more specific, here’s a manual-DI version for our example:
+具体的に見てみましょう。これが手動DIの例です。
 
 ````scala
 object TrainStation extends App {
@@ -27,21 +27,21 @@ object TrainStation extends App {
 }
 ````
 
-## Advantages of Manual DI
+## 手動DIの利点
 
-The first advantage of the approach presented above is type-safety: the dependency resolution is done at compile-time, so you can be sure that all dependencies are met.
+最初の利点は、型安全になることです。つまりコンパイル時に依存関係が解決されます。
 
-No run-time reflection is needed, which has a slight startup-time benefit (no need to scan the classpath), but also removes a lot of "magic" from the code. There are no annotations to scan for. We are only using plain Scala, and constructor parameters. It is possible to navigate to the place where the instance is created. The process of creating the object graph is clear. The application is also simple to use, and can be easily packaged e.g. as a fat-jar. No containers to start, no frameworks to fight against.
+コンパイル時であれば、起動時間を無視できるという利点があります(cクラスパスをスキャンしなくていい等)。さらに黒魔術的なコードを取り除くことができる。そしてスキャンするためのアノテーションはありません。私たちは、素のScalaとコンストラクタパラメータだけを使います。それはどこでインスタンスを作ればいいか分かりやすくなり、オブジェクトの関係が明確になります。そのアプリケーションもまたシンプルに使えますし、例えばfat-jarのようなパッケージングも簡単になります。コンテナはいらないし、フレームワークと戦う必要もないんです。
 
-If creating an instance of some object is complex, or choosing an implementation depends on some configuration, thanks to the flexibility of manual DI, we can easily run arbitrary code which should compute the dependency to use.
+もし複雑なインスタンス生成だったり、設定に依存してたりするなら、柔軟な手動DIの恩恵が受けられます。依存関係は簡単に書きたいですよね。
 
 ## `val` vs. `lazy val` 
 
-Defining dependencies using `val`s has one drawback: if a dependency is used, before being initialised, it will be `null` when referenced. That is because `val`s are calculated from top to bottom.
+valには欠点があり、インスタンス化前に参照するとnullになってしまいます。valは上から下に評価されるからです。
 
-This can be solved by using `lazy val`s, which are calculated on-demand, and the right initialisation order will be calculated automatically.
+ですが、lazy valを使えは解決します。
 
-Hence our manual-DI example becomes:
+というわけで、手動DIのサンプルは以下のようになります。
 
 ````scala
 object TrainStation extends App {
